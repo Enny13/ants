@@ -9,7 +9,7 @@ type Modification = [Char] -> [Char]
 
 syn   = 0
 light = 5
-hard  = 10
+hard  = 25
 crit  = 100
 
 terminator = ('Х', 'Х')
@@ -92,7 +92,7 @@ cng n = do
 	return (changeAtIndex n i)
 
 estimate :: [Command] -> [Command] -> Int
-estimate xs ys = (sum $ zipWith weight xs' ys') + (crit * (size1 - size2))
+estimate xs ys = (sum $ zipWith weight xs' ys') + (crit * (abs (size1 - size2)))
 	where xs' = takeWhile notTerminator (xs ++ terminators)
 	      ys' = takeWhile notTerminator (ys ++ terminators)
 	      size1 = length xs'
