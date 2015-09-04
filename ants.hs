@@ -129,6 +129,5 @@ main = do
 	contents <- hGetContents handleR
 	let lns = lines contents
 	mapM ((hPutStrLn handleW) . toString . processLine) lns       
-	mapM ((putStrLn) . toString . processLine) lns               
 	hClose handleR
 	hClose handleW	
