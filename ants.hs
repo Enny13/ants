@@ -21,7 +21,8 @@ items = ['К', 'Л', 'П', 'Х']
 
 removeAtIndex n xs = let (ys, zs) = splitAt n xs in ys ++ (tail zs)
 insertAtIndex n c xs  = let (ys, zs) = splitAt n xs in ys ++ [c] ++ (zs)
-changeAtIndex n c xs  = let (ys, zs) = splitAt n xs in ys ++ [c] ++ (tail zs)
+changeAtIndex n c xs  = let (ys, zs) = splitAt n xs in ys ++ [c] ++ (tail zs)                            
+                            
 
 
 fromListSym :: Ord a => [((a, a), b)] -> Map (a, a) b
@@ -83,7 +84,7 @@ ins :: Int -> Parser Modification
 ins n = do
 	string (pack "вст")
 	i <- item
-	return (insertAtIndex n i)
+	return (insertAtIndex (n + 1) i)
 
 cng :: Int -> Parser Modification
 cng n = do
@@ -127,13 +128,7 @@ main = do
 	handleW   <- openFile "results.txt" WriteMode
 	contents <- hGetContents handleR
 	let lns = lines contents
-	mapM ((hPutStrLn handleW) . toString . processLine) lns
+	mapM ((hPutStrLn handleW) . toString . processLine) lns       
+	mapM ((putStrLn) . toString . processLine) lns               
 	hClose handleR
-	hClose handleW
-	
-	
-	 --initial configuration of items
-
-
-
-
+	hClose handleW	
