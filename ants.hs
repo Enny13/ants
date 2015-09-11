@@ -12,9 +12,7 @@ light = 5
 hard  = 25
 crit  = 100
 
-terminator = ('Х', 'Х')
-
-terminators = terminator : terminators
+exes = "ХХ"
 
 items :: [Char]
 items = ['К', 'Л', 'П', 'Х']
@@ -65,9 +63,14 @@ parseCommand = do
 	c2 <- item
 	return (c1, c2)
 
-parseCommands :: Parser [Command]
-parseCommands = many' parseCommand
+terminator :: Parser Command
+terminator = do 
+	c1 <- char 'Х'
+	c2 <- char 'Х'
+	return (c1, c2)
 
+parseCommands :: Parser [Command]
+parseCommands = manyTill' parseCommand terminator
 
 parseModif :: Parser Modification
 parseModif = do
@@ -77,7 +80,7 @@ parseModif = do
 del :: Int -> Parser Modification
 del n = do
 	string (pack "удл")
-	return (removeAtIndex n)
+	return (removeAtIndex (n - 1))
 
 ins :: Int -> Parser Modification
 ins n = do
@@ -89,22 +92,20 @@ cng :: Int -> Parser Modification
 cng n = do
 	string (pack "изм")
 	i <- item
-	return (changeAtIndex n i)
+	return (changeAtIndex (n - 1) i)
 
 estimate :: [Command] -> [Command] -> Int
-estimate xs ys = (sum $ zipWith weight xs' ys') + (crit * (abs (size1 - size2)))
-	where xs' = takeWhile notTerminator (xs ++ terminators)
-	      ys' = takeWhile notTerminator (ys ++ terminators)
-	      size1 = length xs'
-	      size2 = length ys'
-	      notTerminator = (/=) terminator 
+estimate xs ys = (sum $ zipWith weight xs ys) + (crit * (abs (size1 - size2)))
+	where size1 = length xs
+	      size2 = length ys
 	      
 processExperiment :: [Char] -> [Char] -> Either String Int
 processExperiment exp m = do
 	modification    <- parseOnly parseModif    $ pack m
-	commands        <- parseOnly parseCommands $ pack exp
-	commands'       <- parseOnly parseCommands $ pack (modification exp)
-	return $ estimate commands commands'
+	commands        <- parseOnly parseCommands $ pack (exp ++ exes)
+	commands'       <- parseOnly parseCommands $ pack ((modification exp) ++ exes)
+	return $ estimate commands' commands
+
 
 processLine :: [Char] -> Either String Int
 processLine l = do
@@ -132,7 +133,6 @@ main = do
 	hClose handleW
 	
 	
-	 --initial configuration of items
 
 
 
